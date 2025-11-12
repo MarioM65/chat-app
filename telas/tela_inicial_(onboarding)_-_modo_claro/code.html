@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+
+<html class="light" lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Onboarding - App de Chat para Estagiários</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#137fec",
+            "background-light": "#f6f7f8",
+            "background-dark": "#101922",
+          },
+          fontFamily: {
+            "display": ["Plus Jakarta Sans", "sans-serif"]
+          },
+          borderRadius: {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+        },
+      },
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      font-size: 24px;
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display">
+<div class="relative flex min-h-screen w-full flex-col group/design-root overflow-x-hidden">
+<main class="flex-grow flex flex-col items-center justify-center">
+<div class="w-full max-w-md mx-auto p-4 flex flex-col">
+<!-- Logo -->
+<div class="flex justify-center items-center h-12 mb-6">
+<svg class="h-8 w-auto text-primary" fill="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M21.5,12a9.5,9.5,0,0,1-19,0,3.49,3.49,0,0,1,1.17-2.65A3.49,3.49,0,0,1,1.17,6.65,9.5,9.5,0,0,1,21.5,12Zm-17,0A7.5,7.5,0,0,0,12,19.5,7.5,7.5,0,0,0,19.5,12a1.5,1.5,0,0,0-3,0A4.5,4.5,0,0,1,7.5,12a1.5,1.5,0,0,0-3,0Z"></path>
+</svg>
+</div>
+<!-- Illustration -->
+<div class="w-full gap-1 overflow-hidden bg-transparent @[480px]:gap-2 aspect-square rounded-lg flex mb-6">
+<div class="w-full bg-center bg-no-repeat bg-contain aspect-auto rounded-none flex-1" data-alt="Stylized illustration of three young professionals collaborating and chatting in a modern workspace." style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAS-C4kfFq9nFz2Piqw3svA9cHdkb31xuiNuoCjO2vF6JVLVtBjvWsEnEc6cWTVYVl3JKc98WMYWMMMdY_VGJs8-lHP1UdQtSiL4EqIWq7K54QXKl5jBApk6ZmOYkxBghXcXzKzmhn_gUOVp7VSqnes5aPujtKGmiJpW3sPuxbPw0OTLRPPZvtZBysTus7V1q1DLvXLdZvahhEfHEmInpGJB7cnUViGN7swpmfBSg0qfzN5y-p1EewEkDOSAkR-N6EOTLSUhtK01amz");'></div>
+</div>
+<!-- HeadlineText -->
+<h1 class="text-[#111418] dark:text-white tracking-tight text-[32px] font-bold leading-tight text-center pb-3">Conecte-se e Cresça.</h1>
+<!-- BodyText -->
+<p class="text-[#617589] dark:text-gray-400 text-base font-normal leading-normal pb-6 text-center">
+          O espaço exclusivo para estagiários trocarem ideias, colaborarem em projetos e construírem sua rede de contatos.
+        </p>
+<!-- TextGrid -->
+<div class="grid grid-cols-[repeat(auto-fit,minmax(158px,1fr))] gap-4">
+<div class="flex flex-1 gap-3 rounded-xl border border-[#dbe0e6] dark:border-gray-700 bg-white dark:bg-background-dark p-4 flex-col">
+<div class="text-primary">
+<span class="material-symbols-outlined">chat_bubble</span>
+</div>
+<div class="flex flex-col gap-1">
+<h2 class="text-[#111418] dark:text-white text-base font-bold leading-tight">Conversas Diretas</h2>
+<p class="text-[#617589] dark:text-gray-400 text-sm font-normal leading-normal">Inicie chats privados com facilidade.</p>
+</div>
+</div>
+<div class="flex flex-1 gap-3 rounded-xl border border-[#dbe0e6] dark:border-gray-700 bg-white dark:bg-background-dark p-4 flex-col">
+<div class="text-primary">
+<span class="material-symbols-outlined">group</span>
+</div>
+<div class="flex flex-col gap-1">
+<h2 class="text-[#111418] dark:text-white text-base font-bold leading-tight">Grupos Temáticos</h2>
+<p class="text-[#617589] dark:text-gray-400 text-sm font-normal leading-normal">Crie ou participe de grupos de discussão.</p>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- ButtonGroup -->
+<footer class="w-full">
+<div class="flex justify-center">
+<div class="flex flex-1 gap-3 max-w-md flex-col items-stretch px-4 py-6">
+<button class="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-12 px-5 bg-primary text-white text-base font-bold leading-normal tracking-[0.015em] w-full">
+<span class="truncate">Vamos Começar</span>
+</button>
+<button class="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-12 px-5 bg-primary/20 dark:bg-primary/30 text-primary text-base font-bold leading-normal tracking-[0.015em] w-full">
+<span class="truncate">Já tenho conta</span>
+</button>
+</div>
+</div>
+</footer>
+</div>
+</body></html>

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html class="dark" lang="pt-br"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Onboarding - Chat App</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#137fec",
+            "background-light": "#f6f7f8",
+            "background-dark": "#101922",
+          },
+          fontFamily: {
+            "display": ["Plus Jakarta Sans", "sans-serif"]
+          },
+          borderRadius: {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "2xl": "1rem",
+            "full": "9999px"
+          },
+        },
+      },
+    }
+  </script>
+<style>
+    body {
+      min-height: 100dvh;
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-800 dark:text-white">
+<div class="relative flex min-h-dvh w-full flex-col">
+<div class="flex w-full max-w-md mx-auto flex-col p-4 flex-grow">
+<header class="flex w-full justify-center pt-8 pb-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-3xl">forum</span>
+<span class="text-xl font-bold">InternConnect</span>
+</div>
+</header>
+<main class="flex flex-col items-center flex-grow">
+<div class="w-full px-4 mt-4 mb-8">
+<div class="aspect-square w-full rounded-2xl bg-cover bg-center bg-no-repeat" data-alt="Ilustração de jovens profissionais colaborando e conversando em um ambiente de trabalho moderno." style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBJu1gbxaK_QONDcmDhj4p3H9RTFnH2x03ej83oo4H8kgjO1jmsn6eJHAZJm1clb4jER78Z4fztzB6dnxLxGsN_hs8ANpOElJMOXtxaFQ3br-ilTJPkwbNQCEbf1dCx-rE5wVRhPuTYTnV-O8BTJMsFp2kJ2ixLLfoawL3kUaCS8gjb_0OPDpy_jsYl18jg5_3IovzxIIXKHssqrn9kGqjgVtyJduklSv4p5JSE9h2Ng8illWrmK6AVOlQBGJUEXUut34Ao4S-WjZNr");'></div>
+</div>
+<div class="text-center px-4">
+<h1 class="text-[32px] font-extrabold leading-tight tracking-tight">
+            Conecte-se e Colabore com Outros Estagiários
+          </h1>
+<p class="mt-3 text-base text-slate-600 dark:text-slate-400">
+            O espaço definitivo para suas conversas, projetos e networking.
+          </p>
+</div>
+<div class="flex-grow"></div>
+<div class="w-full px-4 pt-8 pb-8 flex flex-col items-center gap-4">
+<button class="flex h-14 w-full items-center justify-center rounded-xl bg-primary px-6 text-base font-bold text-white shadow-sm transition-colors hover:bg-primary/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
+            Começar Agora
+          </button>
+<p class="text-sm text-slate-600 dark:text-slate-400">
+            Já possui uma conta? <a class="font-bold text-primary hover:underline" href="#">Entrar</a>
+</p>
+</div>
+</main>
+</div>
+</div>
+
+</body></html>

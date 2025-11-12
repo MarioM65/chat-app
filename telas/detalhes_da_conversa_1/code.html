@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Tela de Chat</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#137fec",
+              "background-light": "#f6f7f8",
+              "background-dark": "#101922",
+            },
+            fontFamily: {
+              "display": ["Plus Jakarta Sans", "Noto Sans", "sans-serif"]
+            },
+            borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display">
+<div class="relative flex h-screen w-full flex-col group/design-root overflow-hidden">
+<!-- Header Bar -->
+<div class="flex items-center p-4 pb-2 bg-background-light dark:bg-background-dark border-b border-white/5 dark:border-white/10 shrink-0 shadow-sm">
+<button class="flex items-center justify-center p-2 rounded-full hover:bg-black/10 dark:hover:bg-white/10">
+<span class="material-symbols-outlined text-black dark:text-white">arrow_back</span>
+</button>
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full w-10 h-10 ml-2 shrink-0" data-alt="Avatar do grupo Projeto Marketing Q3" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCrscEpHN5E_iofcmJb7ts7RpsB8a0v8m2EocSUNAddHTWLIyFRafdq_Wq0pRdzs6AFDxgjvLa2nb10ehSml5GSYm9Oy0jaKsUJRfUPAHYnBvipVn9t3a2T7rKzvz3aiFSuHpU1gUOBjnr6YIq8ruRvo24pP1GhbP555f-UYcumnXBWlKfdDJBLLD8nlK8AikSIZy145sIEy52SNxkXQpaJN1yKN8c46WNhFeyr_jb0Tv4taUWtP1TtRjLj8hpJoxgOUlT-_iTwbIqk");'></div>
+<h2 class="text-black dark:text-white text-lg font-bold leading-tight tracking-[-0.015em] flex-1 ml-3">Projeto Marketing Q3</h2>
+<div class="flex w-12 items-center justify-end">
+<button class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-12 w-12 text-black dark:text-white gap-2 text-base font-bold leading-normal tracking-[0.015em] min-w-0 p-0 hover:bg-black/10 dark:hover:bg-white/10">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+</div>
+<!-- Message List Area -->
+<div class="flex-1 overflow-y-auto p-4 space-y-4">
+<!-- Date Separator -->
+<div class="flex justify-center my-4">
+<span class="text-xs font-semibold text-gray-500 dark:text-gray-400 bg-gray-200 dark:bg-gray-700/50 rounded-full px-3 py-1">Hoje</span>
+</div>
+<!-- Received Message -->
+<div class="flex items-end gap-3">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full w-8 h-8 shrink-0" data-alt="Avatar de Ana Silva" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCs0rC7rzrLGlXQVw3EdS8_9fjZyGTadvjjuPgU6NcoRmh0cnoJ6F1I1DR4bw-kRRinL2BhvezUJJb0plV5rBoiBrShem3-j0ORFH61W6n98uy4R911IrqeM7IYHGEig_mje97g_cCloHViDWxVrn06_B6_f7-X3_Tu9JzDfCNuwnLnA1kcj0Zv8Wwq4B1z6-0b-Ba0I5gHCE9s2KSH5_g3iIpwZa38RVTUd_ar0l_nae04wUV71HKyXwErn4_mMqGeABe5DHFC_fPo");'></div>
+<div class="flex flex-1 flex-col gap-1 items-start">
+<p class="text-gray-500 dark:text-gray-400 text-[13px] font-medium leading-normal max-w-[360px]">Ana Silva</p>
+<div class="flex items-end gap-2">
+<p class="text-base font-normal leading-normal flex max-w-[360px] rounded-lg rounded-bl-none px-4 py-3 bg-gray-200 dark:bg-gray-700 text-black dark:text-white">Olá! Tudo bem? Conseguiu ver o documento que enviei?</p>
+<span class="text-xs text-gray-400 dark:text-gray-500 pb-1">14:20</span>
+</div>
+</div>
+</div>
+<!-- Sent Message -->
+<div class="flex items-end gap-3 justify-end">
+<div class="flex flex-1 flex-col gap-1 items-end">
+<p class="text-gray-500 dark:text-gray-400 text-[13px] font-medium leading-normal max-w-[360px] text-right">Você</p>
+<div class="flex items-end gap-2">
+<span class="text-xs text-gray-400 dark:text-gray-500 pb-1">14:21</span>
+<p class="text-base font-normal leading-normal flex max-w-[360px] rounded-lg rounded-br-none px-4 py-3 bg-primary text-white">Oi, Ana! Vi sim, já estou revisando. Te dou um retorno em breve!</p>
+<span class="material-symbols-outlined text-primary text-base pb-1">done_all</span>
+</div>
+</div>
+</div>
+<!-- Another Received Message -->
+<div class="flex items-end gap-3">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full w-8 h-8 shrink-0" data-alt="Avatar de Carlos Souza" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBW-SEKn8XqELQzC98x93Z2OxMvb_O8h_PGK_aiBLV89jih5zykQnM7iwIfqOnwMYbs0070mFEMjhFoLgI01oezNP9YTlQ7T8GRaBb2NrBfMcAaaTS36libHqAXpnyJIZGD9mcPvdIjaqZgUeo15ioewpnWxiLRryUt5B9biKCACUjsv0x05HEordNScqtvC70WlS7nLObqKBI94m2Nb-DDCy5Kl3icXukMvI57KiQxi5zjcNtW_xsTncX3zt56FPQEN5Nj5eO-Ltiw");'></div>
+<div class="flex flex-1 flex-col gap-1 items-start">
+<p class="text-gray-500 dark:text-gray-400 text-[13px] font-medium leading-normal max-w-[360px]">Carlos Souza</p>
+<div class="flex items-end gap-2">
+<p class="text-base font-normal leading-normal flex max-w-[360px] rounded-lg rounded-bl-none px-4 py-3 bg-gray-200 dark:bg-gray-700 text-black dark:text-white">Perfeito, pessoal. Lembrem-se da reunião de alinhamento às 15h.</p>
+<span class="text-xs text-gray-400 dark:text-gray-500 pb-1">14:25</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Input Bar -->
+<div class="flex items-center px-4 py-3 gap-3 bg-background-light dark:bg-background-dark border-t border-white/5 dark:border-white/10 shrink-0">
+<label class="flex flex-col min-w-40 h-12 flex-1">
+<div class="flex w-full flex-1 items-stretch rounded-xl h-full">
+<button class="flex items-center justify-center p-3 bg-gray-200 dark:bg-gray-700 rounded-l-xl border-r border-gray-300 dark:border-gray-600">
+<span class="material-symbols-outlined text-gray-600 dark:text-gray-300">add</span>
+</button>
+<input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden text-black dark:text-white focus:outline-0 focus:ring-0 border-none bg-gray-200 dark:bg-gray-700 h-full placeholder:text-gray-500 dark:placeholder:text-gray-400 px-4 text-base font-normal leading-normal" placeholder="Digite sua mensagem..." value=""/>
+<button class="flex items-center justify-center p-3 bg-primary rounded-r-xl">
+<span class="material-symbols-outlined text-white">send</span>
+</button>
+</div>
+</label>
+</div>
+</div>
+</body></html>

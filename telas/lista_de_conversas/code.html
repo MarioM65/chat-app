@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Tela de Conversas</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#137fec",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#101922",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans", "Noto Sans", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+          font-variation-settings:
+          'FILL' 0,
+          'wght' 400,
+          'GRAD' 0,
+          'opsz' 24
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display">
+<div class="relative mx-auto flex h-screen max-w-lg flex-col overflow-hidden bg-background-light dark:bg-background-dark">
+<!-- Top App Bar -->
+<header class="flex shrink-0 items-center justify-between bg-background-light px-4 py-3 dark:bg-background-dark">
+<div class="flex size-12 items-center justify-start">
+<div class="aspect-square size-10 rounded-full bg-cover bg-center" data-alt="User profile picture" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBWuwrj_abrHeUUBTG7dLfGSMmipINr-JZBB16f_mF_tzf6scTBqg84LHD_yZvdA-ioL04EtsJXhndAsmUaGp7mMYTT1_Ndbb4AdydtYzU8jud6V6JXz5yMICpodt3TOFhK7kPHiWJo2VmQq_1AXZVM8HWKIfAbd1wDdG8ewrNWcRBqaf7vv_D5DlUD5-cvv5mRdV5c-CZF7f5DZ4n4XglYiNynAM5TR8ZSobW6Ak2r--JWwSEpr5IAYbOVhJELDjjxt-o65k0brINk');"></div>
+</div>
+<h1 class="flex-1 text-center text-xl font-bold text-slate-900 dark:text-white">Conversas</h1>
+<div class="flex size-12 items-center justify-end">
+<button class="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full text-slate-600 hover:bg-slate-200 dark:text-slate-300 dark:hover:bg-slate-700">
+<span class="material-symbols-outlined text-2xl">more_vert</span>
+</button>
+</div>
+</header>
+<!-- Search Bar -->
+<div class="px-4 pb-2 pt-1">
+<label class="flex h-12 w-full flex-col">
+<div class="flex h-full w-full flex-1 items-stretch rounded-lg bg-slate-200 dark:bg-slate-800">
+<div class="flex items-center justify-center pl-4 text-slate-500 dark:text-slate-400">
+<span class="material-symbols-outlined">search</span>
+</div>
+<input class="form-input h-full min-w-0 flex-1 resize-none overflow-hidden border-none bg-transparent px-2 text-base font-normal leading-normal text-slate-800 placeholder:text-slate-500 focus:outline-0 focus:ring-0 dark:text-white dark:placeholder:text-slate-400" placeholder="Buscar conversas ou contatos" value=""/>
+</div>
+</label>
+</div>
+<!-- Conversation List -->
+<main class="flex-1 overflow-y-auto">
+<div class="flex flex-col">
+<!-- List Item 1: Unread messages -->
+<div class="flex cursor-pointer items-center gap-4 px-4 py-3 hover:bg-slate-100 dark:hover:bg-slate-800/50">
+<div class="relative shrink-0">
+<div class="aspect-square size-14 rounded-full bg-cover bg-center" data-alt="Profile picture of Maria Silva" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBh0cIeiXMbcBwHorVQMmQhveR5S_sdG0i9SV8u6_RojJH0E9USB-BS_SMohTz2kecPvov7dd_--oQ1kTxldpCxZt6M2x63Ge0F8nboFcc27ghMUUKb9J7w0Gw1c60tvzLW2VR76WFokMVnUnvv3vP_XXlZYbn2z9BLgJd8QA08kYzW2mNbdsXFBZ0QBs3P8iMJK1oQhjfeoBavPajgX9iYgmTlNMuVw90zwiJChAhouFqSbswvQ4tuUec1QQcycNapivgyblPQwGqf');"></div>
+</div>
+<div class="flex min-w-0 flex-1 flex-col justify-center">
+<p class="truncate text-base font-semibold text-slate-800 dark:text-white">Maria Silva</p>
+<p class="truncate text-sm font-medium text-primary dark:text-primary">Ok, te vejo lá!</p>
+</div>
+<div class="flex shrink-0 flex-col items-end gap-1.5 self-start">
+<p class="text-xs font-medium text-primary">10:45</p>
+<div class="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-xs font-bold text-white">2</div>
+</div>
+</div>
+<!-- List Item 2: Group chat, no unread -->
+<div class="flex cursor-pointer items-center gap-4 px-4 py-3 hover:bg-slate-100 dark:hover:bg-slate-800/50">
+<div class="relative shrink-0">
+<div class="aspect-square size-14 rounded-full bg-cover bg-center" data-alt="Abstract gradient for group icon" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDN9zIIKyJ-mkyjjcz-v_16Ek22a6LCa0aUR1M0l_1uu4_MFp6wjx9SSn9rfUFFGr-qHeq9syPLc6JWbW8W1Q9OeiQfeBYt64xNOKK3LtUWg6fmjg9OHrfT5nzhHtIbB2xZ-NAju9F6Op_fwlHfDlcekr_3bygdGAbZmy5kPaiwihNhwpIZ-CLfhuOVtvqscWt8Gg9_7I609htw0yGUrnzxv6zElFtL_vPMEiyG9Q-3u67ZtpgjxbyuKGqvy0Yw33tyCMGTRF50qqDT');"></div>
+<div class="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full border-2 border-background-light bg-slate-300 dark:border-background-dark dark:bg-slate-600">
+<span class="material-symbols-outlined text-sm text-slate-600 dark:text-slate-300">groups</span>
+</div>
+</div>
+<div class="flex min-w-0 flex-1 flex-col justify-center">
+<p class="truncate text-base font-medium text-slate-800 dark:text-white">Projeto Final</p>
+<p class="truncate text-sm text-slate-500 dark:text-slate-400">João: O relatório já está pronto.</p>
+</div>
+<div class="flex shrink-0 flex-col items-end self-start">
+<p class="text-xs text-slate-400 dark:text-slate-500">Ontem</p>
+</div>
+</div>
+<!-- List Item 3: Individual chat, read -->
+<div class="flex cursor-pointer items-center gap-4 px-4 py-3 hover:bg-slate-100 dark:hover:bg-slate-800/50">
+<div class="relative shrink-0">
+<div class="aspect-square size-14 rounded-full bg-cover bg-center" data-alt="Profile picture of Ana Costa" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuByt0ggGciHPestBAbMQmBwuXV7AxR1lp2cL_lgi8fCIq-TL-uwjILhEHtYRZRtoIkC-Hi-fDErceodADFlQUNbIeHLVeCACasuZCp70D7zHJ5tg5_xoNBd9qS09yp1gvJDf_MAp5h4KKL98PHzEsJaun-Qsa35gu0WiTHDPrZd2VJwtXJdwWjKx_ykCC-Mw8C2h30JZsSf05-WTkVOxxfEUOEXBxq_iP5NflVhJnZAwZHuoMaEi8rdsjSRNbRnJOSvDKUVAAaDsfDp');"></div>
+</div>
+<div class="flex min-w-0 flex-1 flex-col justify-center">
+<p class="truncate text-base font-medium text-slate-800 dark:text-white">Ana Costa</p>
+<p class="truncate text-sm text-slate-500 dark:text-slate-400">Perfeito, obrigada!</p>
+</div>
+<div class="flex shrink-0 flex-col items-end self-start">
+<p class="text-xs text-slate-400 dark:text-slate-500">10:12</p>
+</div>
+</div>
+<!-- List Item 4: Individual chat, read -->
+<div class="flex cursor-pointer items-center gap-4 px-4 py-3 hover:bg-slate-100 dark:hover:bg-slate-800/50">
+<div class="relative shrink-0">
+<div class="aspect-square size-14 rounded-full bg-cover bg-center" data-alt="Profile picture of Pedro Almeida" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAS-hgdUtEW2DqyhBkX6vfdXHyGZ2AW77U1OtyoqZ2tyl1kv42_fw1i4efyuHVjKHlm9BiQSPCzeMQJI1JnijMpLBhoZFxtSn0O-USIgBfO0_cefqBmAt0FjhRk81DHA5_5f6Lo6kkW0S3kpFJlRXUd1ODULwJ0CZPrgWsXR90lJijSuBiwzjcLTkCQR_r61XedXjEyQifmgNyKnk3O7FARZ0_5tPZjbpmxlFe1LM7wiF8Bwumge-Fp6sVm45oT4NbwgAVO1fEy9uBJ');"></div>
+</div>
+<div class="flex min-w-0 flex-1 flex-col justify-center">
+<p class="truncate text-base font-medium text-slate-800 dark:text-white">Pedro Almeida</p>
+<p class="truncate text-sm text-slate-500 dark:text-slate-400">Já enviei o email para o cliente.</p>
+</div>
+<div class="flex shrink-0 flex-col items-end self-start">
+<p class="text-xs text-slate-400 dark:text-slate-500">09:30</p>
+</div>
+</div>
+<!-- List Item 5: Group chat, unread -->
+<div class="flex cursor-pointer items-center gap-4 px-4 py-3 hover:bg-slate-100 dark:hover:bg-slate-800/50">
+<div class="relative shrink-0">
+<div class="aspect-square size-14 rounded-full bg-cover bg-center" data-alt="Pastel gradient for group icon" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBOmSnN1cfKdKHfUu8bPMgiOrjvo76tYuxb4T2LxWJcIiPt3ya0fWTFFy1iOuyQ3XwAwDYk-gCne8ZxwZozhafsbOuWn7R3qVRqdeN8xmgerDQ5HHuiDyk4gs_CbYwECe7bQ1h7vFD6lyComPFof_7YPgoDMacFQZk7W-x8RKT2SEjTbuF6q8NepQKJlAW-aTxyScoFy0CDl-0G5NXNzU0ntLdzuMbNlms_-oZQqbUDzLzK178PLC3sdQiV5wiASylPrFcm00YHWJRp');"></div>
+<div class="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full border-2 border-background-light bg-slate-300 dark:border-background-dark dark:bg-slate-600">
+<span class="material-symbols-outlined text-sm text-slate-600 dark:text-slate-300">groups</span>
+</div>
+</div>
+<div class="flex min-w-0 flex-1 flex-col justify-center">
+<p class="truncate text-base font-semibold text-slate-800 dark:text-white">Estagiários Tech</p>
+<p class="truncate text-sm font-medium text-primary dark:text-primary">Laura: Alguém pode me ajudar com Docker?</p>
+</div>
+<div class="flex shrink-0 flex-col items-end gap-1.5 self-start">
+<p class="text-xs font-medium text-primary">08:55</p>
+<div class="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-xs font-bold text-white">1</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Floating Action Button -->
+<div class="absolute bottom-6 right-6">
+<button class="flex h-14 w-14 items-center justify-center rounded-full bg-primary text-white shadow-lg transition-transform duration-200 ease-in-out hover:scale-105">
+<span class="material-symbols-outlined text-3xl">edit</span>
+</button>
+</div>
+</div>
+</body></html>
