@@ -111,7 +111,7 @@ class _CreateConversationScreenState extends State<CreateConversationScreen> {
       );
 
       // The backend returns the full conversation object now, including existing one for individual chats
-      final newConversation = Conversation.fromJson(conversationResponse);
+      final newConversation = Conversation.fromJson(conversationResponse['data']);
       Navigator.of(context).pop(newConversation); // Return the new or existing conversation
 
     } catch (e) {

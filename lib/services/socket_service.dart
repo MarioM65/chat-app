@@ -46,6 +46,12 @@ class SocketService {
     });
     
     socket.onError((error) => print('Socket Error: $error'));
+
+    socket.on('errorMessage', (data) {
+      print('SocketService received errorMessage: $data');
+      // Depending on the application's needs, you might want to
+      // handle this error more gracefully, e.g., show a toast.
+    });
   }
 
   // Listen for new messages

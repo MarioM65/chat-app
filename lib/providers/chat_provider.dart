@@ -70,6 +70,21 @@ class ChatProvider with ChangeNotifier {
     );
   }
 
+  Future<void> sendAttachmentOnly(List<XFile> attachments) async {
+    try {
+      await _apiService.sendMessage(
+        conversationId: conversationId,
+        content: '', // No content for attachment-only messages
+        messageType: 'anexo',
+        attachments: attachments,
+      );
+      // Rely on WebSocket event from server for message to appear in chat
+    } catch (e) {
+      print('Error sending attachment: $e');
+      // Handle error, e.g., show a snackbar
+    }
+  }
+
   Future<void> sendAttachment(List<XFile> attachments) async {
     try {
       await _apiService.sendMessage(

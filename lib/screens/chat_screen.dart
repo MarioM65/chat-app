@@ -24,11 +24,12 @@ class _ChatScreenState extends State<ChatScreen> {
   Conversation? _conversation;
   bool _isLoadingConversation = true;
   final ImagePicker _picker = ImagePicker();
-  List<XFile> _filesToSend = [];
+
   final String _baseUrl = dotenv.env['BASE_URL']!; // Add base URL
   late TextEditingController _messageController; // Declare here
   Message? _replyingToMessage; // Track message being replied to
   Message? _editingMessage; // Track message being edited
+  SocketService? _socketService; // Declare SocketService instance
 
   @override
   void initState() {
@@ -39,13 +40,16 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    _socketService = Provider.of<SocketService>(context, listen: false); // Get SocketService instance
     final args = ModalRoute.of(context)!.settings.arguments;
+    
     if (args is Conversation) {
       setState(() {
         _conversation = args;
         _isLoadingConversation = false;
       });
       _markMessagesAsRead(args.idConversa); // Mark messages as read
+      _socketService?.joinConversation(args.idConversa.toString()); // Join the conversation room
     } else if (args is int) {
       _fetchConversationDetails(args);
     } else {
@@ -66,6 +70,7 @@ class _ChatScreenState extends State<ChatScreen> {
         _isLoadingConversation = false;
       });
       _markMessagesAsRead(conversationId); // Mark messages as read
+      _socketService?.joinConversation(conversationId.toString()); // Join the conversation room
     } catch (e) {
       print('Error fetching conversation details: $e');
       setState(() {
@@ -91,6 +96,9 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   void dispose() {
     _messageController.dispose(); // Dispose controller
+    if (_conversation != null) {
+      _socketService?.leaveConversation(_conversation!.idConversa.toString()); // Leave the conversation room
+    }
     super.dispose();
   }
 
@@ -107,10 +115,8 @@ class _ChatScreenState extends State<ChatScreen> {
                 onTap: () async {
                   Navigator.of(context).pop();
                   final List<XFile>? images = await _picker.pickMultiImage();
-                  if (images != null && images.isNotEmpty) {
-                    setState(() {
-                      _filesToSend.addAll(images);
-                    });
+                  if (images != null && images.isNotEmpty && _conversation != null) {
+                    Provider.of<ChatProvider>(context, listen: false).sendAttachmentOnly(images);
                   }
                 },
               ),
@@ -120,10 +126,8 @@ class _ChatScreenState extends State<ChatScreen> {
                 onTap: () async {
                   Navigator.of(context).pop();
                   final XFile? video = await _picker.pickVideo(source: ImageSource.gallery);
-                  if (video != null) {
-                    setState(() {
-                      _filesToSend.add(video);
-                    });
+                  if (video != null && _conversation != null) {
+                    Provider.of<ChatProvider>(context, listen: false).sendAttachmentOnly([video]);
                   }
                 },
               ),
@@ -515,14 +519,14 @@ class _ChatScreenState extends State<ChatScreen> {
                 onPressed: () {
                   if (_editingMessage != null) {
                     _editMessage(_editingMessage!.id, _messageController.text);
-                  } else if (_messageController.text.isNotEmpty || _filesToSend.isNotEmpty) {
+                  } else if (_messageController.text.isNotEmpty) {
+                    // Only send text if not editing and there is text
                     Provider.of<ChatProvider>(context, listen: false).sendComposedMessage(
                       _messageController.text,
-                      _filesToSend,
+                      [], // No attachments are sent with the text message here
                     );
                     _messageController.clear();
                     setState(() {
-                      _filesToSend.clear();
                       _replyingToMessage = null; // Clear replying state after sending
                     });
                   }
