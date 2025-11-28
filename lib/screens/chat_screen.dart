@@ -1,4 +1,5 @@
 
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
@@ -22,6 +23,7 @@ class _ChatScreenState extends State<ChatScreen> {
   Conversation? _conversation;
   bool _isLoadingConversation = true;
   final ImagePicker _picker = ImagePicker();
+  List<XFile> _filesToSend = [];
 
   @override
   void didChangeDependencies() {
@@ -148,6 +150,18 @@ class _ChatScreenState extends State<ChatScreen> {
                                 child: Column(
                                   crossAxisAlignment: isSentByMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
                                   children: [
+                                    if (conversation.tipoConversa == 'grupo' && !isSentByMe)
+                                      Padding(
+                                        padding: const EdgeInsets.only(bottom: 4.0),
+                                        child: Text(
+                                          message.remetente.nomeUsuario,
+                                          style: TextStyle(
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.bold,
+                                            color: isDarkMode ? Colors.cyanAccent : Colors.blueAccent, // Distinct color for sender name
+                                          ),
+                                        ),
+                                      ),
                                     if (message.anexos.isNotEmpty)
                                       ...message.anexos.map((anexo) => AttachmentView(attachment: anexo)).toList(),
                                     if (message.conteudo.isNotEmpty)
@@ -156,12 +170,25 @@ class _ChatScreenState extends State<ChatScreen> {
                                         style: TextStyle(color: isSentByMe ? Colors.white : textColor),
                                       ),
                                     SizedBox(height: 4),
-                                    Text(
-                                      DateFormat('HH:mm').format(message.criadoEm),
-                                      style: TextStyle(
-                                        color: isSentByMe ? Colors.white70 : Colors.grey,
-                                        fontSize: 10,
-                                      ),
+                                    Row(
+                                      mainAxisSize: MainAxisSize.min, // Ensure the Row takes minimum space
+                                      children: [
+                                        Text(
+                                          DateFormat('HH:mm').format(message.criadoEm),
+                                          style: TextStyle(
+                                            color: isSentByMe ? Colors.white70 : Colors.grey,
+                                            fontSize: 10,
+                                          ),
+                                        ),
+                                        if (isSentByMe) ...[
+                                          SizedBox(width: 4),
+                                          Icon(
+                                            message.isReadByAnyOtherParticipant == true ? Icons.done_all : Icons.done,
+                                            size: 15,
+                                            color: message.isReadByAnyOtherParticipant == true ? primaryColor : Colors.white70,
+                                          ),
+                                        ],
+                                      ],
                                     ),
                                   ],
                                 ),
@@ -193,7 +220,9 @@ class _ChatScreenState extends State<ChatScreen> {
                   Navigator.of(context).pop();
                   final List<XFile>? images = await _picker.pickMultiImage();
                   if (images != null && images.isNotEmpty) {
-                    Provider.of<ChatProvider>(context, listen: false).sendAttachment(images);
+                    setState(() {
+                      _filesToSend.addAll(images);
+                    });
                   }
                 },
               ),
@@ -204,7 +233,9 @@ class _ChatScreenState extends State<ChatScreen> {
                   Navigator.of(context).pop();
                   final XFile? video = await _picker.pickVideo(source: ImageSource.gallery);
                   if (video != null) {
-                    Provider.of<ChatProvider>(context, listen: false).sendAttachment([video]);
+                    setState(() {
+                      _filesToSend.add(video);
+                    });
                   }
                 },
               ),
@@ -231,59 +262,113 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
+  Widget _buildAttachmentPreview() {
+    return Container(
+      padding: EdgeInsets.all(8),
+      child: SizedBox(
+        height: 100,
+        child: ListView.builder(
+          scrollDirection: Axis.horizontal,
+          itemCount: _filesToSend.length,
+          itemBuilder: (context, index) {
+            final file = _filesToSend[index];
+            return Stack(
+              children: [
+                Container(
+                  margin: EdgeInsets.only(right: 8),
+                  width: 100,
+                  height: 100,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: Image.file(File(file.path), fit: BoxFit.cover),
+                  ),
+                ),
+                Positioned(
+                  right: 0,
+                  top: 0,
+                  child: InkWell(
+                    onTap: () {
+                      setState(() {
+                        _filesToSend.removeAt(index);
+                      });
+                    },
+                    child: CircleAvatar(
+                      radius: 12,
+                      backgroundColor: Colors.black54,
+                      child: Icon(Icons.close, color: Colors.white, size: 16),
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
+      ),
+    );
+  }
+
   Widget _buildMessageComposer(BuildContext context, bool isDarkMode, Color primaryColor) {
     final _messageController = TextEditingController();
 
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-      color: isDarkMode ? Color(0xFF1A202C) : Colors.white,
-      child: Row(
-        children: [
-          IconButton(
-            icon: Icon(Icons.attach_file, color: primaryColor),
-            onPressed: () => _showAttachmentMenu(context),
-          ),
-          Expanded(
-            child: Container(
-              decoration: BoxDecoration(
-                color: isDarkMode ? Color(0xFF2D3748) : Color(0xFFF1F1F2),
-                borderRadius: BorderRadius.circular(24),
+    return Column(
+      children: [
+        if (_filesToSend.isNotEmpty) _buildAttachmentPreview(),
+        Container(
+          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          color: isDarkMode ? Color(0xFF1A202C) : Colors.white,
+          child: Row(
+            children: [
+              IconButton(
+                icon: Icon(Icons.attach_file, color: primaryColor),
+                onPressed: () => _showAttachmentMenu(context),
               ),
-              child: Row(
-                children: [
-                  IconButton(
-                    icon: Icon(Icons.emoji_emotions_outlined, color: Colors.grey),
-                    onPressed: () {
-                      // TODO: Implement emoji picker
-                    },
+              Expanded(
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: isDarkMode ? Color(0xFF2D3748) : Color(0xFFF1F1F2),
+                    borderRadius: BorderRadius.circular(24),
                   ),
-                  Expanded(
-                    child: TextField(
-                      controller: _messageController,
-                      decoration: InputDecoration(
-                        hintText: 'Digite sua mensagem...',
-                        border: InputBorder.none,
-                        contentPadding: EdgeInsets.symmetric(vertical: 10),
+                  child: Row(
+                    children: [
+                      IconButton(
+                        icon: Icon(Icons.emoji_emotions_outlined, color: Colors.grey),
+                        onPressed: () {
+                          // TODO: Implement emoji picker
+                        },
                       ),
-                    ),
+                      Expanded(
+                        child: TextField(
+                          controller: _messageController,
+                          decoration: InputDecoration(
+                            hintText: 'Digite sua mensagem...',
+                            border: InputBorder.none,
+                            contentPadding: EdgeInsets.symmetric(vertical: 10),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
-            ),
+              IconButton(
+                icon: Icon(Icons.send, color: primaryColor),
+                onPressed: () {
+                  if (_messageController.text.isNotEmpty || _filesToSend.isNotEmpty) {
+                    Provider.of<ChatProvider>(context, listen: false).sendComposedMessage(
+                      _messageController.text,
+                      _filesToSend,
+                    );
+                    _messageController.clear();
+                    setState(() {
+                      _filesToSend.clear();
+                    });
+                  }
+                },
+              ),
+            ],
           ),
-          IconButton(
-            icon: Icon(Icons.send, color: primaryColor),
-            onPressed: () {
-              if (_messageController.text.isNotEmpty) {
-                Provider.of<ChatProvider>(context, listen: false).sendMessage(
-                  _messageController.text,
-                );
-                _messageController.clear();
-              }
-            },
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

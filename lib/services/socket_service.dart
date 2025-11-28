@@ -26,7 +26,10 @@ class SocketService {
 
   // Listen for new messages
   void onChatMessage(Function(Map<String, dynamic>) handler) {
-    socket.on('chatMessage', (data) => handler(data));
+    socket.on('chatMessage', (data) {
+      print('SocketService received chatMessage: $data');
+      handler(data);
+    });
   }
 
   // Join a conversation room

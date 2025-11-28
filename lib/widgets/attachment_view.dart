@@ -14,7 +14,15 @@ class AttachmentView extends StatelessWidget {
 
     Widget attachmentWidget;
 
-    if (attachment.tipo.startsWith('image/')) {
+    String mimeType = attachment.tipo;
+    if (mimeType == 'application/octet-stream') {
+      final extension = attachment.nomeArquivo.split('.').last.toLowerCase();
+      if (['png', 'jpg', 'jpeg', 'gif'].contains(extension)) {
+        mimeType = 'image/$extension';
+      }
+    }
+
+    if (mimeType.startsWith('image/')) {
       attachmentWidget = Image.network(
         fullPath,
         width: 200,
@@ -30,7 +38,7 @@ class AttachmentView extends StatelessWidget {
           );
         },
       );
-    } else if (attachment.tipo.startsWith('video/')) {
+    } else if (mimeType.startsWith('video/')) {
       // For video, we'll just show a placeholder with a play icon for now.
       // Full video playback requires a video_player package and more complex implementation.
       attachmentWidget = Container(
@@ -45,7 +53,7 @@ class AttachmentView extends StatelessWidget {
           ],
         ),
       );
-    } else if (attachment.tipo.startsWith('audio/')) {
+    } else if (mimeType.startsWith('audio/')) {
       // For audio, show an audio icon and filename
       attachmentWidget = Container(
         width: 200,

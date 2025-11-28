@@ -22,10 +22,16 @@ class ChatProvider with ChangeNotifier {
     fetchMessages();
     _socketService.joinConversation(conversationId.toString());
     _socketService.onChatMessage((data) {
-      final message = Message.fromJson(data);
-      if (message.idConversa == conversationId) {
-        _messages.insert(0, message);
-        notifyListeners();
+      print('ChatProvider received raw message data: $data');
+      try {
+        final message = Message.fromJson(data);
+        print('ChatProvider parsed message: $message');
+        if (message.idConversa == conversationId) {
+          _messages.insert(0, message);
+          notifyListeners();
+        }
+      } catch (e) {
+        print('Error parsing message from socket: $e');
       }
     });
   }
@@ -66,6 +72,20 @@ class ChatProvider with ChangeNotifier {
         attachments: attachments,
       );
       await fetchMessages(); // Refresh messages after sending attachment
+    } catch (e) {
+      // Handle error
+    }
+  }
+
+  Future<void> sendComposedMessage(String content, List<XFile> attachments) async {
+    try {
+      await _apiService.sendMessage(
+        conversationId: conversationId,
+        content: content,
+        messageType: attachments.isNotEmpty ? 'anexo' : 'texto',
+        attachments: attachments,
+      );
+      await fetchMessages();
     } catch (e) {
       // Handle error
     }

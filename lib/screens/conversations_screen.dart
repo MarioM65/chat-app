@@ -129,15 +129,24 @@ class _ConversationsScreenState extends State<ConversationsScreen> {
                     itemCount: conversationProvider.conversations.length,
                     itemBuilder: (context, index) {
                       final conversation = conversationProvider.conversations[index];
-                      // This is a placeholder for unread count and last message time, as the API doesn't provide it directly
-                      final unreadCount = 0; 
-                      final lastMessageTime = DateTime.now();
+                      final lastMessage = conversation.lastMessage;
+                      final unreadCount = conversation.unreadCount;
+                      final lastMessageTime = lastMessage?.criadoEm;
+                      
+                      String subtitleText = "Nenhuma mensagem.";
+                      if (lastMessage != null) {
+                        if (lastMessage.conteudo.isNotEmpty) {
+                          subtitleText = lastMessage.conteudo;
+                        } else if (lastMessage.anexos.isNotEmpty) {
+                          subtitleText = "Anexo";
+                        }
+                      }
                       
                       return ListTile(
                         onTap: () {
                           Navigator.of(context).pushNamed('/chat', arguments: conversation);
                         },
-                                                leading: CircleAvatar(
+                        leading: CircleAvatar(
                           radius: 28,
                           backgroundImage: conversation.displayImage != null
                               ? Image.network(
@@ -156,7 +165,7 @@ class _ConversationsScreenState extends State<ConversationsScreen> {
                           style: TextStyle(fontWeight: FontWeight.bold, color: textColor),
                         ),
                         subtitle: Text(
-                          "Last message placeholder", // No last message in conversation model
+                          subtitleText,
                           style: TextStyle(
                             color: unreadCount > 0 ? primaryColor : secondaryTextColor,
                             fontWeight: unreadCount > 0 ? FontWeight.bold : FontWeight.normal,
@@ -168,13 +177,14 @@ class _ConversationsScreenState extends State<ConversationsScreen> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
-                            Text(
-                              _formatConversationTime(lastMessageTime),
-                              style: TextStyle(
-                                color: unreadCount > 0 ? primaryColor : secondaryTextColor,
-                                fontSize: 12,
+                            if (lastMessageTime != null)
+                              Text(
+                                _formatConversationTime(lastMessageTime),
+                                style: TextStyle(
+                                  color: unreadCount > 0 ? primaryColor : secondaryTextColor,
+                                  fontSize: 12,
+                                ),
                               ),
-                            ),
                             SizedBox(height: 4),
                             if (unreadCount > 0)
                               Container(

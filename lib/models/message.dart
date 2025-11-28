@@ -10,6 +10,7 @@ class Message {
   final int idConversa;
   final DateTime criadoEm;
   final List<Attachment> anexos;
+  final bool? isReadByAnyOtherParticipant;
 
   Message({
     required this.id,
@@ -19,12 +20,13 @@ class Message {
     required this.idConversa,
     required this.criadoEm,
     required this.anexos,
+    this.isReadByAnyOtherParticipant,
   });
 
   factory Message.fromJson(Map<String, dynamic> json) {
     return Message(
       id: json['id'],
-      conteudo: json['conteudo'],
+      conteudo: json['conteudo'] ?? '',
       tipo: json['tipo'],
       remetente: User.fromMap(json['remetente']),
       idConversa: json['id_conversa'],
@@ -32,6 +34,7 @@ class Message {
       anexos: (json['anexos'] as List)
           .map((anexo) => Attachment.fromJson(anexo))
           .toList(),
+      isReadByAnyOtherParticipant: json['isReadByAnyOtherParticipant'],
     );
   }
 }
