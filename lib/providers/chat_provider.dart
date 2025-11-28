@@ -20,6 +20,12 @@ class ChatProvider with ChangeNotifier {
 
   ChatProvider(this._apiService, this._socketService, this._authService, this.conversationId) {
     fetchMessages();
+    _socketService.socketConnected.then((_) { // Wait for socket to connect
+      _initSocketListeners();
+    });
+  }
+
+  void _initSocketListeners() {
     _socketService.joinConversation(conversationId.toString());
     _socketService.onChatMessage((data) {
       print('ChatProvider received raw message data: $data');
@@ -56,6 +62,7 @@ class ChatProvider with ChangeNotifier {
     }
   }
 
+  // This method should primarily be used by the SocketService for real-time messaging
   void sendMessage(String content) {
     _socketService.sendMessage(
       conversationId: conversationId,
@@ -71,7 +78,7 @@ class ChatProvider with ChangeNotifier {
         messageType: 'anexo',
         attachments: attachments,
       );
-      await fetchMessages(); // Refresh messages after sending attachment
+      // Do not fetch messages here. Rely on WebSocket event from server.
     } catch (e) {
       // Handle error
     }
@@ -79,13 +86,21 @@ class ChatProvider with ChangeNotifier {
 
   Future<void> sendComposedMessage(String content, List<XFile> attachments) async {
     try {
-      await _apiService.sendMessage(
-        conversationId: conversationId,
-        content: content,
-        messageType: attachments.isNotEmpty ? 'anexo' : 'texto',
-        attachments: attachments,
-      );
-      await fetchMessages();
+      if (attachments.isNotEmpty) {
+        await _apiService.sendMessage(
+          conversationId: conversationId,
+          content: content,
+          messageType: 'anexo', // If attachments exist, treat as anexo
+          attachments: attachments,
+        );
+        // Do not fetch messages here. Rely on WebSocket event from server.
+      } else {
+        // Text-only message, send via WebSocket
+        _socketService.sendMessage(
+          conversationId: conversationId,
+          content: content,
+        );
+      }
     } catch (e) {
       // Handle error
     }

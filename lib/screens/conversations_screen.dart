@@ -143,8 +143,13 @@ class _ConversationsScreenState extends State<ConversationsScreen> {
                       }
                       
                       return ListTile(
-                        onTap: () {
-                          Navigator.of(context).pushNamed('/chat', arguments: conversation);
+                        onTap: () async {
+                          final updatedConversation = await Navigator.of(context).pushNamed('/chat', arguments: conversation);
+                          if (updatedConversation != null && updatedConversation is Conversation) {
+                            conversationProvider.updateConversation(updatedConversation);
+                          } else {
+                            conversationProvider.fetchConversations(); // Refresh if no specific update
+                          }
                         },
                         leading: CircleAvatar(
                           radius: 28,
@@ -208,9 +213,41 @@ class _ConversationsScreenState extends State<ConversationsScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.of(context).pushNamed('/create-conversation');
+          showModalBottomSheet(
+            context: context,
+            builder: (BuildContext bc) {
+              return SafeArea(
+                child: Wrap(
+                  children: <Widget>[
+                    ListTile(
+                      leading: Icon(Icons.chat),
+                      title: Text('Nova Conversa'),
+                      onTap: () async {
+                        Navigator.of(context).pop();
+                        final newConversation = await Navigator.of(context).pushNamed('/create-conversation');
+                        if (newConversation != null && newConversation is Conversation) {
+                          conversationProvider.addConversation(newConversation);
+                        }
+                      },
+                    ),
+                    ListTile(
+                      leading: Icon(Icons.group_add),
+                      title: Text('Novo Grupo'),
+                      onTap: () async {
+                        Navigator.of(context).pop();
+                        final newGroupConversation = await Navigator.of(context).pushNamed('/create_group');
+                        if (newGroupConversation != null && newGroupConversation is Conversation) {
+                          conversationProvider.addConversation(newGroupConversation);
+                        }
+                      },
+                    ),
+                  ],
+                ),
+              );
+            },
+          );
         },
-        child: Icon(Icons.edit),
+        child: Icon(Icons.add), // Changed icon to add
         backgroundColor: primaryColor,
       ),
     );

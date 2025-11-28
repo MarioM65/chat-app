@@ -12,6 +12,10 @@ import 'package:app/screens/conversations_screen.dart';
 import 'package:app/screens/chat_screen.dart';
 import 'package:app/screens/edit_profile_screen.dart';
 import 'package:app/screens/create_conversation_screen.dart';
+import 'package:app/screens/create_group_screen.dart'; // Import new screen
+import 'package:app/screens/select_users_screen.dart'; // Import new screen
+import 'package:app/screens/edit_group_screen.dart'; // Import new screen
+import 'package:app/models/conversation.dart'; // Import Conversation model for route arguments
 
 import 'package:app/providers/chat_provider.dart';
 import 'package:app/providers/conversation_provider.dart';
@@ -42,7 +46,7 @@ class MyApp extends StatelessWidget {
         ),
         ChangeNotifierProvider<ConversationProvider>(
           create: (context) => ConversationProvider(
-              context.read<ApiService>(), context.read<AuthService>()),
+              context.read<ApiService>(), context.read<AuthService>(), context.read<SocketService>()), // Added SocketService
         ),
       ],
       child: MaterialApp(
@@ -79,6 +83,9 @@ class MyApp extends StatelessWidget {
           '/chat': (context) => ChatScreen(),
           '/edit-profile': (context) => EditProfileScreen(),
           '/create-conversation': (context) => CreateConversationScreen(),
+          '/create_group': (context) => CreateGroupScreen(),
+          '/select_users': (context) => SelectUsersScreen(),
+          '/edit_group': (context) => EditGroupScreen(conversation: ModalRoute.of(context)!.settings.arguments as Conversation), // New route
         },
       ),
     );

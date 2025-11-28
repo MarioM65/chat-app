@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http_parser/http_parser.dart';
+import 'package:app/models/new_group_participant.dart'; // Import the new model
 
 class ApiService {
   final String _baseUrl = dotenv.env['BASE_URL']!;
@@ -169,27 +170,27 @@ class ApiService {
   Future<Map<String, dynamic>> createConversation({
     required String tipoConversa,
     String? nomeConversa,
-    List<int>? idUsuarios,
-    XFile? fotoConversaFile, // Changed to XFile?
+    List<NewGroupParticipant>? participantes, // Changed to NewGroupParticipant
+    XFile? fotoConversaFile,
   }) async {
     final token = await getToken();
     final uri = Uri.parse('$_baseUrl/conversas');
 
-    if (fotoConversaFile != null) { // Changed condition
+    if (fotoConversaFile != null) {
       var request = http.MultipartRequest('POST', uri);
       request.headers['Authorization'] = 'Bearer $token';
 
       request.fields['tipo_conversa'] = tipoConversa;
       if (nomeConversa != null) request.fields['nome_conversa'] = nomeConversa;
-      if (idUsuarios != null) {
-        request.fields['id_usuarios'] = jsonEncode(idUsuarios);
+      if (participantes != null) {
+        request.fields['participantes'] = jsonEncode(participantes.map((p) => p.toJson()).toList()); // Encode participants
       }
       
-      final fileBytes = await fotoConversaFile.readAsBytes(); // Read bytes from XFile
-      request.files.add(http.MultipartFile.fromBytes( // Use fromBytes
+      final fileBytes = await fotoConversaFile.readAsBytes();
+      request.files.add(http.MultipartFile.fromBytes(
         'foto_conversa',
         fileBytes,
-        filename: fotoConversaFile.name, // Use XFile's name
+        filename: fotoConversaFile.name,
       ));
 
       final streamedResponse = await request.send();
@@ -210,7 +211,7 @@ class ApiService {
         body: jsonEncode(<String, dynamic>{
           'tipo_conversa': tipoConversa,
           'nome_conversa': nomeConversa,
-          'id_usuarios': idUsuarios,
+          'participantes': participantes?.map((p) => p.toJson()).toList(), // Encode participants
         }),
       );
 
@@ -219,6 +220,108 @@ class ApiService {
       } else {
         throw Exception('Failed to create conversation');
       }
+    }
+  }
+
+  Future<Map<String, dynamic>> updateConversation(
+    int conversationId, {
+    String? nomeConversa,
+    XFile? fotoConversaFile,
+  }) async {
+    final token = await getToken();
+    final uri = Uri.parse('$_baseUrl/conversas/$conversationId');
+
+    var request = http.MultipartRequest('PUT', uri);
+    request.headers['Authorization'] = 'Bearer $token';
+
+    if (nomeConversa != null) request.fields['nome_conversa'] = nomeConversa;
+
+    if (fotoConversaFile != null) {
+      final fileBytes = await fotoConversaFile.readAsBytes();
+      request.files.add(http.MultipartFile.fromBytes(
+        'foto_conversa',
+        fileBytes,
+        filename: fotoConversaFile.name,
+        contentType: MediaType('image', 'jpeg'), // Assuming jpeg, adjust if needed
+      ));
+    }
+
+    final streamedResponse = await request.send();
+    final response = await http.Response.fromStream(streamedResponse);
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception('Failed to update conversation');
+    }
+  }
+
+  Future<Map<String, dynamic>> addMemberToConversation({
+    required int conversationId,
+    required int userId,
+    required String role, // 'CRIADOR', 'ADMIN', 'MEMBRO'
+  }) async {
+    final token = await getToken();
+    final response = await http.post(
+      Uri.parse('$_baseUrl/conversas/$conversationId/membros'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode(<String, dynamic>{
+        'id_usuario': userId,
+        'papel': role,
+      }),
+    );
+
+    if (response.statusCode == 201) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception('Failed to add member to conversation');
+    }
+  }
+
+  Future<Map<String, dynamic>> removeMemberFromConversation({
+    required int conversationId,
+    required int userId,
+  }) async {
+    final token = await getToken();
+    final response = await http.delete(
+      Uri.parse('$_baseUrl/conversas/$conversationId/membros/$userId'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception('Failed to remove member from conversation');
+    }
+  }
+
+  Future<Map<String, dynamic>> updateMemberRoleInConversation({
+    required int conversationId,
+    required int userId,
+    required String role, // 'CRIADOR', 'ADMIN', 'MEMBRO'
+  }) async {
+    final token = await getToken();
+    final response = await http.put(
+      Uri.parse('$_baseUrl/conversas/$conversationId/membros/$userId/role'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode(<String, dynamic>{
+        'papel': role,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception('Failed to update member role in conversation');
     }
   }
 
@@ -263,8 +366,8 @@ class ApiService {
 
   Future<void> updateUserStatus(int userId, String status) async {
     final token = await getToken();
-    await http.put(
-      Uri.parse('$_baseUrl/users/$userId'),
+    await http.patch( // Changed from put to patch
+      Uri.parse('$_baseUrl/users/$userId/status'), // Changed URL
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer $token',
@@ -327,6 +430,43 @@ class ApiService {
       return jsonDecode(response.body);
     } else {
       throw Exception('Failed to send message');
+    }
+  }
+
+  Future<Map<String, dynamic>> updateMessage(int messageId, String newContent) async {
+    final token = await getToken();
+    final response = await http.put(
+      Uri.parse('$_baseUrl/mensagens/$messageId'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode(<String, dynamic>{
+        'conteudo': newContent,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception('Failed to update message');
+    }
+  }
+
+  Future<Map<String, dynamic>> deleteMessage(int messageId) async {
+    final token = await getToken();
+    final response = await http.delete(
+      Uri.parse('$_baseUrl/mensagens/$messageId'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception('Failed to delete message');
     }
   }
 
@@ -471,6 +611,77 @@ class ApiService {
       return jsonDecode(response.body);
     } else {
       throw Exception('Failed to delete notification');
+    }
+  }
+
+  Future<void> deleteConversation(int conversationId) async {
+    final token = await getToken();
+    final response = await http.delete(
+      Uri.parse('$_baseUrl/conversas/$conversationId'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to delete conversation');
+    }
+  }
+
+  Future<void> blockUser(int idUsuarioBloqueado) async {
+    final token = await getToken();
+    final response = await http.post(
+      Uri.parse('$_baseUrl/users-bloqueados/block'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode(<String, dynamic>{
+        'id_usuario_bloqueado': idUsuarioBloqueado,
+      }),
+    );
+
+    if (response.statusCode != 201) { // 201 Created is expected for POST /block
+      throw Exception('Failed to block user');
+    }
+  }
+
+  Future<void> unblockUser(int idUsuarioBloqueado) async {
+    final token = await getToken();
+    final response = await http.delete(
+      Uri.parse('$_baseUrl/users-bloqueados/unblock'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode(<String, dynamic>{
+        'id_usuario_bloqueado': idUsuarioBloqueado,
+      }),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to unblock user');
+    }
+  }
+
+  // Mark conversation as read
+  Future<void> markConversationAsRead(int conversationId) async {
+    try {
+      final messages = await getMessages(conversationId);
+      
+      for (var message in messages) {
+        final messageId = message['id'] ?? message['idMensagem'];
+        if (messageId != null) {
+          await createLeituraMensagem(
+            idMensagem: messageId,
+            dataHoraLeitura: DateTime.now(),
+          );
+        }
+      }
+    } catch (e) {
+      print('Error marking conversation as read: $e');
+      // Don't throw, as this is a non-critical operation
     }
   }
 }

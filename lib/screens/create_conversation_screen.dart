@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:app/api/api_service.dart';
 import 'package:app/services/auth_service.dart';
 import 'package:app/models/user_model.dart';
+import 'package:app/models/new_group_participant.dart'; // Import NewGroupParticipant
+import 'package:app/models/conversation.dart'; // Import Conversation
 
 class CreateConversationScreen extends StatefulWidget {
   @override
@@ -82,26 +84,35 @@ class _CreateConversationScreenState extends State<CreateConversationScreen> {
         return;
       }
       
-      final participantIds = _selectedUsers.map((user) => user.id).toList();
-      // participantIds.add(currentUser.id); // Removed this line, backend adds creator automatically
+      List<NewGroupParticipant> participants = _selectedUsers.map((user) {
+        return NewGroupParticipant(userId: user.id, role: 'MEMBRO');
+      }).toList();
+
+      // For individual chats, ensure the current user is added as a participant
+      if (!_isGroupChat && !participants.any((p) => p.userId == currentUser.id)) {
+        participants.insert(0, NewGroupParticipant(userId: currentUser.id, role: 'MEMBRO'));
+      }
+      // For group chats, the backend automatically adds the creator with 'CRIADOR' role
+      // so we only need to pass the selected members with 'MEMBRO' role.
 
       String? conversationName;
       if (_isGroupChat) {
         conversationName = _groupNameController.text.trim();
       } else {
         final selectedUser = _selectedUsers.first;
-        conversationName = 'Conversa entre ${currentUser.nomeUsuario} e ${selectedUser.nomeUsuario}';
+        conversationName = 'Conversa entre ${currentUser.nomeUsuario} e ${selectedUser.nomeUsuario}'; // This name might not be used by backend for individual
       }
 
       final conversationResponse = await apiService.createConversation(
         tipoConversa: _isGroupChat ? 'grupo' : 'individual',
         nomeConversa: conversationName,
-        idUsuarios: participantIds,
+        participantes: participants, // Now passing NewGroupParticipant list
         // fotoConversaPath: _conversationImage?.path, // Placeholder for photo upload
       );
 
-      final conversationId = conversationResponse['data']['id_conversa'];
-      Navigator.of(context).pushReplacementNamed('/chat', arguments: conversationId);
+      // The backend returns the full conversation object now, including existing one for individual chats
+      final newConversation = Conversation.fromJson(conversationResponse);
+      Navigator.of(context).pop(newConversation); // Return the new or existing conversation
 
     } catch (e) {
       print('Error creating conversation: $e');

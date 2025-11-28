@@ -1,10 +1,11 @@
 
 import 'package:app/models/user_model.dart';
 import 'package:app/models/message.dart'; // Import the Message model
+import 'package:app/models/participante_conversa_model.dart'; // Import the new participant model
 
 class Conversation {
   final int idConversa; // Changed from 'id' to 'idConversa'
-  final List<User> participantes;
+  final List<ParticipanteConversa> participantes; // Changed to ParticipanteConversa
   final String tipoConversa;
   final String? nomeConversa;
   final String? fotoConversa;
@@ -32,7 +33,7 @@ class Conversation {
       nomeConversa: json['nome_conversa'],
       fotoConversa: json['foto_conversa'], // Mapped to foto_conversa
       participantes: (json['participante_conversa'] as List?) // Changed to participante_conversa
-              ?.map((participant) => User.fromMap(participant['usuario']))
+              ?.map((participantJson) => ParticipanteConversa.fromJson(participantJson)) // Map to ParticipanteConversa
               .toList() ??
           [],
       displayName: json['display_name'] ?? json['nome_conversa'],
@@ -49,7 +50,7 @@ class Conversation {
       tipoConversa: conversationJson['tipo_conversa'],
       nomeConversa: conversationJson['nome_conversa'],
       fotoConversa: conversationJson['foto_conversa'], // Mapped to foto_conversa
-      participantes: [User.fromMap(json['usuario'])], // This factory is specifically for participant data
+      participantes: [ParticipanteConversa.fromJson(json)], // Assuming `json` itself is a ParticipanteConversa for this factory
       displayName: json['display_name'],
       displayImage: json['display_image'],
       lastMessage: null, // Default for this factory
