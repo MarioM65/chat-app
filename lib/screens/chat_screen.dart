@@ -1,5 +1,6 @@
 
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:app/providers/chat_provider.dart';
@@ -9,8 +10,10 @@ import 'package:app/api/api_service.dart';
 import 'package:app/services/socket_service.dart';
 import 'package:app/models/conversation.dart';
 import 'package:app/models/user_model.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:app/widgets/attachment_view.dart';
 
-class ChatScreen extends StatefulWidget { // Converted to StatefulWidget
+class ChatScreen extends StatefulWidget {
   @override
   _ChatScreenState createState() => _ChatScreenState();
 }
@@ -18,34 +21,43 @@ class ChatScreen extends StatefulWidget { // Converted to StatefulWidget
 class _ChatScreenState extends State<ChatScreen> {
   Conversation? _conversation;
   bool _isLoadingConversation = true;
+  final ImagePicker _picker = ImagePicker();
 
   @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _fetchConversationDetails();
-    });
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final args = ModalRoute.of(context)!.settings.arguments;
+    if (args is Conversation) {
+      setState(() {
+        _conversation = args;
+        _isLoadingConversation = false;
+      });
+    } else if (args is int) {
+      _fetchConversationDetails(args);
+    } else {
+      // Handle the case where arguments are null or of a different type
+      setState(() {
+        _isLoadingConversation = false;
+      });
+    }
   }
 
-  Future<void> _fetchConversationDetails() async {
-    final conversationId = ModalRoute.of(context)!.settings.arguments as int; // Expecting int
-
+  Future<void> _fetchConversationDetails(int conversationId) async {
     try {
       final apiService = Provider.of<ApiService>(context, listen: false);
       final conversationData = await apiService.getConversationById(conversationId);
       
       setState(() {
-        _conversation = Conversation.fromJson(conversationData); // Map the fetched data
+        _conversation = Conversation.fromJson(conversationData);
         _isLoadingConversation = false;
       });
     } catch (e) {
       print('Error fetching conversation details: $e');
-      // Handle error, e.g., show a snackbar and pop
       setState(() {
         _isLoadingConversation = false;
       });
-      // Optionally navigate back if conversation can't be loaded
-      Navigator.of(context).pop();
+      // Optionally show an error and pop
+      // Navigator.of(context).pop();
     }
   }
 
@@ -53,7 +65,7 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget build(BuildContext context) {
     if (_isLoadingConversation) {
       return Scaffold(
-        appBar: AppBar(title: Text('Carregando Conversa.')),
+        appBar: AppBar(title: Text('Carregando Conversa...')),
         body: Center(child: CircularProgressIndicator()),
       );
     }
@@ -61,18 +73,19 @@ class _ChatScreenState extends State<ChatScreen> {
     if (_conversation == null) {
       return Scaffold(
         appBar: AppBar(title: Text('Erro')),
-        body: Center(child: Text('Conversa não encontrada.')),
+        body: Center(child: Text('Não foi possível carregar a conversa.')),
       );
     }
 
-    final conversation = _conversation!; // Use the fetched conversation
-    final currentUserId = context.read<AuthService>().user!.id;
-    // final currentUser = context.read<AuthService>().user!; // Not used directly in build
+    final conversation = _conversation!;
+    final authService = context.read<AuthService>();
+    final currentUserId = authService.user!.id;
 
     return ChangeNotifierProvider(
       create: (context) => ChatProvider(
         context.read<ApiService>(),
         context.read<SocketService>(),
+        authService,
         conversation.idConversa,
       ),
       child: Consumer<ChatProvider>(
@@ -115,7 +128,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       : ListView.builder(
                           padding: EdgeInsets.all(16),
                           itemCount: chatProvider.messages.length,
-                          reverse: true, // Show latest messages at the bottom
+                          reverse: true,
                           itemBuilder: (context, index) {
                             final message = chatProvider.messages[index];
                             final isSentByMe = message.remetente.id == currentUserId;
@@ -135,10 +148,13 @@ class _ChatScreenState extends State<ChatScreen> {
                                 child: Column(
                                   crossAxisAlignment: isSentByMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
                                   children: [
-                                    Text(
-                                      message.conteudo,
-                                      style: TextStyle(color: isSentByMe ? Colors.white : textColor),
-                                    ),
+                                    if (message.anexos.isNotEmpty)
+                                      ...message.anexos.map((anexo) => AttachmentView(attachment: anexo)).toList(),
+                                    if (message.conteudo.isNotEmpty)
+                                      Text(
+                                        message.conteudo,
+                                        style: TextStyle(color: isSentByMe ? Colors.white : textColor),
+                                      ),
                                     SizedBox(height: 4),
                                     Text(
                                       DateFormat('HH:mm').format(message.criadoEm),
@@ -162,6 +178,58 @@ class _ChatScreenState extends State<ChatScreen> {
       ),
     );
   }
+  
+  void _showAttachmentMenu(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext bc) {
+        return SafeArea(
+          child: Wrap(
+            children: <Widget>[
+              ListTile(
+                leading: Icon(Icons.image),
+                title: Text('Imagens'),
+                onTap: () async {
+                  Navigator.of(context).pop();
+                  final List<XFile>? images = await _picker.pickMultiImage();
+                  if (images != null && images.isNotEmpty) {
+                    Provider.of<ChatProvider>(context, listen: false).sendAttachment(images);
+                  }
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.videocam),
+                title: Text('Vídeo'),
+                onTap: () async {
+                  Navigator.of(context).pop();
+                  final XFile? video = await _picker.pickVideo(source: ImageSource.gallery);
+                  if (video != null) {
+                    Provider.of<ChatProvider>(context, listen: false).sendAttachment([video]);
+                  }
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.insert_drive_file),
+                title: Text('Documentos'),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  // TODO: Implement document picking
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.mic),
+                title: Text('Áudio'),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  // TODO: Implement audio picking
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
 
   Widget _buildMessageComposer(BuildContext context, bool isDarkMode, Color primaryColor) {
     final _messageController = TextEditingController();
@@ -172,21 +240,34 @@ class _ChatScreenState extends State<ChatScreen> {
       child: Row(
         children: [
           IconButton(
-            icon: Icon(Icons.add, color: primaryColor),
-            onPressed: () {},
+            icon: Icon(Icons.attach_file, color: primaryColor),
+            onPressed: () => _showAttachmentMenu(context),
           ),
           Expanded(
-            child: TextField(
-              controller: _messageController,
-              decoration: InputDecoration(
-                hintText: 'Digite sua mensagem...', 
-                filled: true,
-                fillColor: isDarkMode ? Color(0xFF2D3748) : Color(0xFFF1F1F2),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(24),
-                  borderSide: BorderSide.none,
-                ),
-                contentPadding: EdgeInsets.symmetric(horizontal: 16),
+            child: Container(
+              decoration: BoxDecoration(
+                color: isDarkMode ? Color(0xFF2D3748) : Color(0xFFF1F1F2),
+                borderRadius: BorderRadius.circular(24),
+              ),
+              child: Row(
+                children: [
+                  IconButton(
+                    icon: Icon(Icons.emoji_emotions_outlined, color: Colors.grey),
+                    onPressed: () {
+                      // TODO: Implement emoji picker
+                    },
+                  ),
+                  Expanded(
+                    child: TextField(
+                      controller: _messageController,
+                      decoration: InputDecoration(
+                        hintText: 'Digite sua mensagem...',
+                        border: InputBorder.none,
+                        contentPadding: EdgeInsets.symmetric(vertical: 10),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),

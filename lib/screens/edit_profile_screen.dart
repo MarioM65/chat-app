@@ -66,6 +66,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         final user = authService.user!;
 
         final response = await apiService.updateUser(
+          user.id,
           nomeUsuario: _nameController.text,
           email: _emailController.text,
           telefone: _phoneController.text,

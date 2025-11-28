@@ -4,7 +4,8 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:image_picker/image_picker.dart'; // Add this import
+import 'package:image_picker/image_picker.dart';
+import 'package:http_parser/http_parser.dart';
 
 class ApiService {
   final String _baseUrl = dotenv.env['BASE_URL']!;
@@ -221,7 +222,8 @@ class ApiService {
     }
   }
 
-  Future<Map<String, dynamic>> updateUser({
+  Future<Map<String, dynamic>> updateUser(
+    int id, {
     String? nomeUsuario,
     String? email,
     String? senha,
@@ -231,7 +233,7 @@ class ApiService {
     final token = await getToken();
     var request = http.MultipartRequest(
       'PUT',
-      Uri.parse('$_baseUrl/users'),
+      Uri.parse('$_baseUrl/users/$id'),
     );
     request.headers['Authorization'] = 'Bearer $token';
 
@@ -259,6 +261,20 @@ class ApiService {
     }
   }
 
+  Future<void> updateUserStatus(int userId, String status) async {
+    final token = await getToken();
+    await http.put(
+      Uri.parse('$_baseUrl/users/$userId'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode(<String, String>{
+        'status': status,
+      }),
+    );
+  }
+
   Future<List<dynamic>> getMessages(int conversationId) async {
     final token = await getToken();
     final response = await http.get(
@@ -274,6 +290,43 @@ class ApiService {
       return data['data'];
     } else {
       throw Exception('Failed to load messages');
+    }
+  }
+
+  Future<Map<String, dynamic>> sendMessage({
+    required int conversationId,
+    required String content,
+    required String messageType,
+    List<XFile>? attachments,
+  }) async {
+    final token = await getToken();
+    final uri = Uri.parse('$_baseUrl/mensagens');
+    var request = http.MultipartRequest('POST', uri);
+    
+    request.headers['Authorization'] = 'Bearer $token';
+    request.fields['id_conversa'] = conversationId.toString();
+    request.fields['conteudo'] = content;
+    request.fields['tipo'] = messageType;
+
+    if (attachments != null) {
+      for (var attachment in attachments) {
+        final fileBytes = await attachment.readAsBytes();
+        request.files.add(http.MultipartFile.fromBytes(
+          'anexos',
+          fileBytes,
+          filename: attachment.name,
+          contentType: MediaType('application', 'octet-stream'),
+        ));
+      }
+    }
+
+    final streamedResponse = await request.send();
+    final response = await http.Response.fromStream(streamedResponse);
+
+    if (response.statusCode == 201) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception('Failed to send message');
     }
   }
 

@@ -63,6 +63,7 @@ class AuthService with ChangeNotifier {
       await prefs.setString('user', _user!.toJson());
 
       _socketService.connect(_token!);
+      await _apiService.updateUserStatus(_user!.id, 'Online');
       _status = AuthStatus.Authenticated;
       notifyListeners();
       return true;
@@ -99,6 +100,7 @@ class AuthService with ChangeNotifier {
       await prefs.setString('user', _user!.toJson());
       
       _socketService.connect(_token!);
+      await _apiService.updateUserStatus(_user!.id, 'Online');
       _status = AuthStatus.Authenticated;
       notifyListeners();
       return true;
@@ -117,6 +119,9 @@ class AuthService with ChangeNotifier {
   }
 
   Future<void> logout() async {
+    if (_user != null) {
+      await _apiService.updateUserStatus(_user!.id, 'Offline');
+    }
     _status = AuthStatus.Unauthenticated;
     _token = null;
     _user = null;

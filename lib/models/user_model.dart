@@ -6,6 +6,7 @@ class User {
   final String email;
   final String? fotoPerfil;
   final String? telefone;
+  final String status;
 
   User({
     required this.id,
@@ -13,6 +14,7 @@ class User {
     required this.email,
     this.fotoPerfil,
     this.telefone,
+    this.status = 'Offline',
   });
 
   factory User.fromMap(Map<String, dynamic> map) {
@@ -22,6 +24,7 @@ class User {
       email: map['email'],
       fotoPerfil: map['foto_perfil'],
       telefone: map['telefone'],
+      status: map['status'] ?? 'Offline',
     );
   }
 
@@ -34,6 +37,7 @@ class User {
       'email': email,
       'foto_perfil': fotoPerfil,
       'telefone': telefone,
+      'status': status,
     };
   }
 
